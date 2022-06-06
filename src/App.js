@@ -11,7 +11,7 @@ function Row(props) {
     <div class="form-group row">
       <label for={id} class="col-sm-2 form-label">{title}</label>
       <div class="col-sm-10">
-        <input readonly class="form-control" type="text" id={id} name={id} value={value}/> 
+        <input readonly class="form-control" type="text" id={id} name={id} value={value}/>
       </div>
     </div>
   );
@@ -22,7 +22,9 @@ function App() {
 
   const [calories, setCalories] = useState("");
 
-  const [fat, setFat] = useState("");
+  const [fatPercentage, setFatPercentage] = useState("");
+  const [fatGram, setFatGram] = useState("");
+
   const [sugar, setSugar] = useState("");
   const [cholesterol, setCholesterol] = useState("");
   const [dietaryFiber, setDietaryFiber] = useState("");
@@ -36,53 +38,79 @@ function App() {
     if (image == null) {
       console.warn('no image found');
       return;
-    } 
+    }
 
     const response = await fetch("http://localhost:5002", {
       method: 'POST',
       body: image
     });
     const nutrition_facts = await response.json();
+    console.log(nutrition_facts);
 
-    if (nutrition_facts["Serving Size"]) {
+    if (nutrition_facts["Serving Size"]["cup"]) { 
       setServingSizeCup(nutrition_facts["Serving Size"]["cup"]);
+    } else {
+      setServingSizeCup("");
+    }
+
+    if (nutrition_facts["Serving Size"]["gram"]) {
       setServingSizeGram(nutrition_facts["Serving Size"]["gram"])
+    } else {
+      setServingSizeGram("")
     }
 
     if (nutrition_facts["Calories"]) {
       setCalories(nutrition_facts["Calories"]["calorie"]);
+    } else {
+        setCalories("")
     }
-    
-    if (nutrition_facts["Total Fat"]) {
-      setFat(nutrition_facts["Total Fat"]["percentage"])
+
+    if (nutrition_facts["Total Fat"]["percentage"]) {
+      setFatPercentage(nutrition_facts["Total Fat"]["percentage"]);
+    } else {
+        setFatPercentage("");
+    }
+
+    if (nutrition_facts["Total Fat"]["gram"]) {
+        setFatGram(nutrition_facts["Total Fat"]["gram"]);
+    } else {
+        setFatGram("");
     }
 
     if (nutrition_facts["Cholesterol"]["milligram"]) {
-      setCholesterol(nutrition_facts["Cholesterol"]["milligram"])
+      setCholesterol(nutrition_facts["Cholesterol"]["milligram"]);
+    } else {
+        setCholesterol("");
     }
 
     if (nutrition_facts["Dietary Fiber"]) {
-      setDietaryFiber(nutrition_facts["Dietary Fiber"]["gram"])
+      setDietaryFiber(nutrition_facts["Dietary Fiber"]["gram"]);
+    } else {
+        setDietaryFiber("");
     }
 
     if (nutrition_facts["Total Carbohydrate"]) {
-      setTotalCarbs(nutrition_facts["Total Carbohydrate"]["gram"])
-    }
-
-    if (nutrition_facts["Total Carbohydrate"]) {
-      setTotalCarbs(nutrition_facts["Total Carbohydrate"]["gram"])
-    }
-
-    if (nutrition_facts["Sugars"]) {
-      setSugar(nutrition_facts["Sugars"]["gram"])
+      setTotalCarbs(nutrition_facts["Total Carbohydrate"]["gram"]);
+    } else {
+        setTotalCarbs("");
     }
 
     if (nutrition_facts["Protein"]) {
-      setProtein(nutrition_facts["Protein"]["gram"])
+      setProtein(nutrition_facts["Protein"]["gram"]);
+    } else {
+        setProtein("");
     }
 
     if (nutrition_facts["Vitamin A"]) {
-      setVitaminA(nutrition_facts["Vitamin A"]["percentage"])
+      setVitaminA(nutrition_facts["Vitamin A"]["percentage"]);
+    } else {
+        setVitaminA("");
+    }
+
+    if (nutrition_facts["Sugars"]) {
+      setSugar(nutrition_facts["Sugars"]["gram"]);
+    } else {
+        setSugar("");
     }
   };
 
@@ -95,7 +123,7 @@ function App() {
         <form>
           <Row id="serving-size" title="Serving Size" value={`${servingSizeCup} cup(s) - ${servingSizeGram}g`}/>
           <Row id="calories" title="Calories" value={`${calories} calories`}/>
-          <Row id="total-fat" title="Total Fat" value={`${fat} percentage`}/>
+          <Row id="total-fat" title="Total Fat" value={`${fatPercentage} percentage - ${fatGram}g`}/>
           <Row id="cholesterol" title="Cholesterol" value={`${cholesterol}mg`}/>
           <Row id="dietary-fiber" title="Dietary Fiber" value={`${dietaryFiber}g`}/>
           <Row id="total-carbs" title="Total Carbohydrate" value={`${totalCarbs}g`}/>
