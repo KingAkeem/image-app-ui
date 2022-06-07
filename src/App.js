@@ -7,8 +7,8 @@ const Units = new Set(["cup", "gram", "calorie", "percentage", "milligram"]);
 const Nutrients = new Set(["Serving Size", "Calories", "Total Fat", "Cholesterol", "Dietary Fiber", "Total Carbohydrate", "Sugars", "Protein", "Vitamin A", "Sodium"]);
 
 function Row(props) {
-  const {id, title, value } = props;
-  return(
+  const {id, title, value} = props;
+  return (
     <div class="form-group row">
       <label for={id} class="col-sm-2 form-label">{title}</label>
       <div class="col-sm-10">
@@ -17,6 +17,7 @@ function Row(props) {
     </div>
   );
 }
+
 function App() {
   const [image, setImage] = useState(null);
   const[nutrients, setNutrients] = useState({});
@@ -33,7 +34,8 @@ function App() {
     });
 
     const nutrition_facts = await response.json();
-    console.log(nutrition_facts)
+    console.debug(nutrition_facts) // check if facts are being displayed
+
     for (const nutrient in nutrition_facts) {
       for (const unit of Units) {
         if (nutrition_facts[nutrient][unit]) {
@@ -48,7 +50,6 @@ function App() {
         }
       }
     }
-
   };
 
   return (
@@ -73,7 +74,7 @@ function App() {
             type="file"
             name="scanImage"
             onChange={(event) => {
-              console.log('setting file', event.target.files[0])
+              console.debug('setting file', event.target.files[0]); // check if image is being set
               setImage(event.target.files[0]);
             }}
           />
