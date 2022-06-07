@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-const units = ["cup", "gram", "calorie", "percentage", "milligram"];
+const Units = new Set(["cup", "gram", "calorie", "percentage", "milligram"]);
+const Nutrients = new Set(["Serving Size", "Calories", "Total Fat", "Cholesterol", "Dietary Fiber", "Total Carbohydrate", "Sugars", "Protein", "Vitamin A", "Sodium"]);
 
 function Row(props) {
   const {id, title, value } = props;
@@ -17,22 +18,8 @@ function Row(props) {
   );
 }
 function App() {
-  const [servingSizeCup, setServingSizeCup] = useState("");
-  const [servingSizeGram, setServingSizeGram] = useState("");
-
-  const [calories, setCalories] = useState("");
-
-  const [fatPercentage, setFatPercentage] = useState("");
-  const [fatGram, setFatGram] = useState("");
-
-  const [sugar, setSugar] = useState("");
-  const [cholesterol, setCholesterol] = useState("");
-  const [dietaryFiber, setDietaryFiber] = useState("");
-  const [totalCarbs, setTotalCarbs] = useState("");
-  const [protein, setProtein] = useState("");
-  const [vitaminA, setVitaminA] = useState("");
-
   const [image, setImage] = useState(null);
+  const[nutrients, setNutrients] = useState({});
 
   const handleScan = async () => {
     if (image == null) {
@@ -44,74 +31,24 @@ function App() {
       method: 'POST',
       body: image
     });
+
     const nutrition_facts = await response.json();
-    console.log(nutrition_facts);
-
-    if (nutrition_facts["Serving Size"]["cup"]) { 
-      setServingSizeCup(nutrition_facts["Serving Size"]["cup"]);
-    } else {
-      setServingSizeCup("");
+    console.log(nutrition_facts)
+    for (const nutrient in nutrition_facts) {
+      for (const unit of Units) {
+        if (nutrition_facts[nutrient][unit]) {
+          const quantity = nutrition_facts[nutrient][unit];
+          setNutrients(prevNutrients => ({
+            ...prevNutrients,
+            [nutrient]: { 
+              ...prevNutrients[nutrient],
+              [unit]:  quantity
+            }
+          }))
+        }
+      }
     }
 
-    if (nutrition_facts["Serving Size"]["gram"]) {
-      setServingSizeGram(nutrition_facts["Serving Size"]["gram"])
-    } else {
-      setServingSizeGram("")
-    }
-
-    if (nutrition_facts["Calories"]) {
-      setCalories(nutrition_facts["Calories"]["calorie"]);
-    } else {
-        setCalories("")
-    }
-
-    if (nutrition_facts["Total Fat"]["percentage"]) {
-      setFatPercentage(nutrition_facts["Total Fat"]["percentage"]);
-    } else {
-        setFatPercentage("");
-    }
-
-    if (nutrition_facts["Total Fat"]["gram"]) {
-        setFatGram(nutrition_facts["Total Fat"]["gram"]);
-    } else {
-        setFatGram("");
-    }
-
-    if (nutrition_facts["Cholesterol"]["milligram"]) {
-      setCholesterol(nutrition_facts["Cholesterol"]["milligram"]);
-    } else {
-        setCholesterol("");
-    }
-
-    if (nutrition_facts["Dietary Fiber"]) {
-      setDietaryFiber(nutrition_facts["Dietary Fiber"]["gram"]);
-    } else {
-        setDietaryFiber("");
-    }
-
-    if (nutrition_facts["Total Carbohydrate"]) {
-      setTotalCarbs(nutrition_facts["Total Carbohydrate"]["gram"]);
-    } else {
-        setTotalCarbs("");
-    }
-
-    if (nutrition_facts["Protein"]) {
-      setProtein(nutrition_facts["Protein"]["gram"]);
-    } else {
-        setProtein("");
-    }
-
-    if (nutrition_facts["Vitamin A"]) {
-      setVitaminA(nutrition_facts["Vitamin A"]["percentage"]);
-    } else {
-        setVitaminA("");
-    }
-
-    if (nutrition_facts["Sugars"]) {
-      setSugar(nutrition_facts["Sugars"]["gram"]);
-    } else {
-        setSugar("");
-    }
   };
 
   return (
@@ -121,15 +58,17 @@ function App() {
       </header>
       <body>
         <form>
-          <Row id="serving-size" title="Serving Size" value={`${servingSizeCup} cup(s) - ${servingSizeGram}g`}/>
-          <Row id="calories" title="Calories" value={`${calories} calories`}/>
-          <Row id="total-fat" title="Total Fat" value={`${fatPercentage} percentage - ${fatGram}g`}/>
-          <Row id="cholesterol" title="Cholesterol" value={`${cholesterol}mg`}/>
-          <Row id="dietary-fiber" title="Dietary Fiber" value={`${dietaryFiber}g`}/>
-          <Row id="total-carbs" title="Total Carbohydrate" value={`${totalCarbs}g`}/>
-          <Row id="sugar" title="Sugar" value={`${sugar}g`}/>
-          <Row id="protein" title="Protein" value={`${protein}g`}/>
-          <Row id="vitamin-a" title="Vitamin A" value={`${vitaminA} percentage`}/>
+          {/* Render nutrition map as rows */}
+          {Nutrients.map(nutrient => {
+            let value = "";
+            Units.forEach((unit, i) => {
+              if (nutrients[nutrient] && nutrients[nutrient][unit]) {
+                if (value === "") value += `${nutrients[nutrient][unit]} ${unit}`
+                else value += ` - ${nutrients[nutrient][unit]} ${unit}`
+              }
+            })
+            return <Row id={nutrient} title={nutrient} value={value}/>;
+          })}
           <input
             type="file"
             name="scanImage"
@@ -147,5 +86,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
