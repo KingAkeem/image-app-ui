@@ -9,9 +9,9 @@ const Nutrients = new Set(["Serving Size", "Calories", "Total Fat", "Cholesterol
 function Row(props) {
   const {id, title, value} = props;
   return (
-    <div class="form-group row">
-      <label for={id} class="col-sm-2 form-label">{title}</label>
-      <div class="col-sm-10">
+    <div class="form-group row justify-content-center w-auto m-3">
+      <label for={id} class="col-auto form-label w-auto">{title}</label>
+      <div class="col-auto">
         <input readonly class="form-control" type="text" id={id} name={id} value={value}/>
       </div>
     </div>
@@ -54,15 +54,15 @@ function App() {
 
   return (
     <div className="App">
-      <header>
-        <h1>Calculate Macros</h1>
+      <header class="bg-dark text-white">
+        <h1 class="mb-0">Calculate Macros</h1>
       </header>
-      <body>
-        <form>
+      <body class="bg-dark vh-100">
+        <form class="bg-light text-dark p-3 text-center form justify-content-center d-inline-block rounded">
           {/* Render nutrition map as rows */}
-          {Nutrients.map(nutrient => {
+          {Array.from(Nutrients).map(nutrient => {
             let value = "";
-            Units.forEach((unit, i) => {
+            Array.from(Units).forEach((unit, i) => {
               if (nutrients[nutrient] && nutrients[nutrient][unit]) {
                 if (value === "") value += `${nutrients[nutrient][unit]} ${unit}`
                 else value += ` - ${nutrients[nutrient][unit]} ${unit}`
